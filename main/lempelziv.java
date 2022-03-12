@@ -20,20 +20,26 @@ public class lempelziv
     public static void main(String[] args) throws IOException{
 
 
+        //timing related objects and variables
         Instant start = Instant.now();
-                
+        Instant end;
+        Duration timeElapsed; 
+        Double timeElapsedSeconds;
+        Double secondsRemainining;
+        Duration timeRemaining;   
         int percentageCounter = 0;
+
         PrintWriter out = new PrintWriter("main/lzoutput.txt");
 
         //Converts .txt to a String
         String filePath = "main/180_samples.txt";        
         String input = usingBufferedReader(filePath);  
         //Count number of N's    
-        double nCount = input.length() - input.replace("N", "").length();        
+        //double nCount = input.length() - input.replace("N", "").length();        
         //Split String into an array based on regex to track dna header
         String splitString[] = input.trim().split(">.*(20..)");
 
-        out.println("NUMBER OF DATAPOINTS: " + (splitString.length-1) + "\n" + "NUMBER OF N's: " + nCount + " , AVERAGE: " + nCount/(splitString.length-1) + " PER ENTRY" + "\n");
+        out.println("NUMBER OF DATAPOINTS: " + (splitString.length-1) + "\n" + "NUMBER OF N's: " + nCount(input) + " , AVERAGE: " + nCount(input)/(splitString.length-1) + " PER ENTRY" + "\n");
 
         //Iterates through the whole splitString array and performs the LZ-complexity algorithm
         //Start from 1, it will put some metadata into the first index because of the regex conditions so ignore it.
@@ -52,21 +58,30 @@ public class lempelziv
                 //with or without spaces between each 8-bit number. Barely affects performance nor LZ-complexity number.
                 //sb.append(" ");                
             }
-            out.println(lempelZivComplexity(sb.toString()));   
+            out.println(lempelZivComplexity(sb.toString()) + ", " + (int)nCount(splitString[i]));   
             percentageCounter++;
             //Assuming that sequencing is for 1000 entries
             //TODO: Not very scalable - support any size of entries? 
             if(percentageCounter % 10 == 0){                   
-                Instant end = Instant.now();
-                Duration timeElapsed = Duration.between(start, end);   
-                Double timeElapsedSeconds = (double) timeElapsed.toSeconds();  
-                Double secondsRemainining = timeElapsedSeconds*(100-(percentageCounter/10))/(percentageCounter/10);
-                Duration timeRemaining = Duration.ofSeconds(secondsRemainining.intValue());       
+                end = Instant.now();
+                timeElapsed = Duration.between(start, end);   
+                timeElapsedSeconds = (double) timeElapsed.toSeconds();  
+                secondsRemainining = timeElapsedSeconds*(100-(percentageCounter/10))/(percentageCounter/10);
+                timeRemaining = Duration.ofSeconds(secondsRemainining.intValue());       
                 System.out.println(percentageCounter/10 + "% - TIME ELAPSED: " + createTime(timeElapsed) + ", TIME REMAINING: " + createTime(timeRemaining));                
             }
         }        
         out.close();
-    }   
+    }  
+    
+    /**
+     * Counts the number of N in a string
+     * @param countedString any String
+     * @return the number of N's in countedString
+     */
+    public static double nCount(String countedString){
+        return countedString.length() - countedString.replace("N", "").length();
+    }
 
     /**
      * Creates a time String using a Duration object. Formats as (hh:mm:ss)
