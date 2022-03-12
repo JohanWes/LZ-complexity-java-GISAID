@@ -12,12 +12,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
+import java.time.Instant;
 
 public class lempelziv
 {  
     public static void main(String[] args) throws IOException{
-        
 
+
+        Instant start = Instant.now();
+                
+        int percentageCounter = 0;
         PrintWriter out = new PrintWriter("main/lzoutput.txt");
 
         //Converts .txt to a String
@@ -48,9 +53,33 @@ public class lempelziv
                 //sb.append(" ");                
             }
             out.println(lempelZivComplexity(sb.toString()));   
+            percentageCounter++;
+            //Assuming that sequencing is for 1000 entries
+            //TODO: Not very scalable - support any size of entries? 
+            if(percentageCounter % 10 == 0){                   
+                Instant end = Instant.now();
+                Duration timeElapsed = Duration.between(start, end);   
+                Double timeElapsedSeconds = (double) timeElapsed.toSeconds();  
+                Double secondsRemainining = timeElapsedSeconds*(100-(percentageCounter/10))/(percentageCounter/10);
+                Duration timeRemaining = Duration.ofSeconds(secondsRemainining.intValue());       
+                System.out.println(percentageCounter/10 + "% - TIME ELAPSED: " + createTime(timeElapsed) + ", TIME REMAINING: " + createTime(timeRemaining));                
+            }
         }        
         out.close();
     }   
+
+    /**
+     * Creates a time String using a Duration object. Formats as (hh:mm:ss)
+     * @param dur the incoming Duration object, used while timing 
+     * @return a String on 
+     */
+    public static String createTime(Duration dur)
+    {
+        int hours = (int) (dur.toSeconds() / 3600);
+        int minutes = (int) ((dur.toSeconds() % 3600) / 60);
+        int seconds = (int) (dur.toSeconds() % 60);
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);        
+    }
 
     /**
      * Calculates the LZ complexity of a given binary sequence in a linear number of operations O(n) = length(sequence)
