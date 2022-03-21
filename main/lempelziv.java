@@ -17,8 +17,7 @@ import java.time.Instant;
 
 public class lempelziv
 {  
-    public static void main(String[] args) throws IOException{
-
+    public static void main(String[] args) throws IOException{        
 
         //timing related objects and variables
         Instant start = Instant.now();
@@ -30,12 +29,11 @@ public class lempelziv
         int percentageCounter = 0;
 
         PrintWriter out = new PrintWriter("main/lzoutput.txt");
+        PrintWriter nout = new PrintWriter("main/noutput.txt");
 
         //Converts .txt to a String
         String filePath = "main/180_samples.txt";        
         String input = usingBufferedReader(filePath);  
-        //Count number of N's    
-        //double nCount = input.length() - input.replace("N", "").length();        
         //Split String into an array based on regex to track dna header
         String splitString[] = input.trim().split(">.*(20..)");
 
@@ -43,8 +41,9 @@ public class lempelziv
 
         //Iterates through the whole splitString array and performs the LZ-complexity algorithm
         //Start from 1, it will put some metadata into the first index because of the regex conditions so ignore it.
+        
         for (int i = 1; i < splitString.length; i++)
-        {
+        {            
             StringBuilder sb = new StringBuilder();
 
             //Converts a String into an 8-bit binary sequence
@@ -54,11 +53,12 @@ public class lempelziv
                 String formatted = String.format("%8s", binary);
                 String output = formatted.replaceAll(" ", "0");
                 sb.append(output);
-
+                
                 //with or without spaces between each 8-bit number. Barely affects performance nor LZ-complexity number.
                 //sb.append(" ");                
             }
-            out.println(lempelZivComplexity(sb.toString()) + ", " + (int)nCount(splitString[i]));   
+            out.println(lempelZivComplexity(sb.toString()));
+            nout.println((int)nCount(splitString[i]));   
             percentageCounter++;
             //Assuming that sequencing is for 1000 entries
             //TODO: Not very scalable - support any size of entries? 
@@ -70,8 +70,10 @@ public class lempelziv
                 timeRemaining = Duration.ofSeconds(secondsRemainining.intValue());       
                 System.out.println(percentageCounter/10 + "% - TIME ELAPSED: " + createTime(timeElapsed) + ", TIME REMAINING: " + createTime(timeRemaining));                
             }
+        
         }        
         out.close();
+        nout.close();
     }  
     
     /**
