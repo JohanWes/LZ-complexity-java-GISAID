@@ -32,7 +32,7 @@ public class lempelziv
         PrintWriter nout = new PrintWriter("main/noutput.txt");
 
         //Converts .txt to a String
-        String filePath = "main/180_samples.txt";        
+        String filePath = "main/samples.txt";        
         String input = usingBufferedReader(filePath);  
         //Split String into an array based on regex to track dna header
         String splitString[] = input.trim().split(">.*(20..)");
